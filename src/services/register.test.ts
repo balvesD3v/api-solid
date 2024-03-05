@@ -1,15 +1,20 @@
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { RegisterService } from './register'
 import { compare } from 'bcryptjs'
-import { InMemoryRepository } from '@/repositories/in-memory/in-memory-users-repository'
+import { InMemoryUserRepository } from '@/repositories/in-memory/in-memory-users-repository'
 import { UserAlreadyExistsError } from './errors/user-already-exists-error'
 
-describe('Register use case', () => {
-  it('Should be able to register user', async () => {
-    const usersRepository = new InMemoryRepository()
-    const registerService = new RegisterService(usersRepository)
+let usersRepository: InMemoryUserRepository
+let sut: RegisterService
 
-    const { user } = await registerService.execute({
+describe('Register use case', () => {
+  beforeEach(() => {
+    usersRepository = new InMemoryUserRepository()
+    sut = new RegisterService(usersRepository)
+  })
+
+  it('Should be able to register user', async () => {
+    const { user } = await sut.execute({
       name: 'luiz',
       email: 'luiz32@prisma.com',
       password: '2423413',
@@ -19,10 +24,7 @@ describe('Register use case', () => {
   })
 
   it('Should hash user password upon registration', async () => {
-    const usersRepository = new InMemoryRepository()
-    const registerService = new RegisterService(usersRepository)
-
-    const { user } = await registerService.execute({
+    const { user } = await sut.execute({
       name: 'luiz',
       email: 'luiz32@prisma.com',
       password: '2423413',
@@ -37,19 +39,16 @@ describe('Register use case', () => {
   })
 
   it('Should not to be able to register with same email twice', async () => {
-    const usersRepository = new InMemoryRepository()
-    const registerService = new RegisterService(usersRepository)
-
     const email = 'luiza@gmail.com'
 
-    await registerService.execute({
+    await sut.execute({
       name: 'luiz',
       email,
       password: '2423413',
     })
 
     await expect(() =>
-      registerService.execute({
+      sut.execute({
         name: 'luiz',
         email,
         password: '2423413',
