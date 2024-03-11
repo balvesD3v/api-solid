@@ -1,6 +1,5 @@
 import fastify from 'fastify'
 import fastifyCookie from '@fastify/cookie'
-import { ZodError } from 'zod'
 import { zodEnv } from './env'
 import fastifyJwt from '@fastify/jwt'
 import { usersRoutes } from './http/controllers/users/routes'
@@ -26,12 +25,6 @@ app.register(gymsRoutes)
 app.register(checkInsRoutes)
 
 app.setErrorHandler((error, _request, reply) => {
-  if (error instanceof ZodError) {
-    return reply
-      .status(400)
-      .send({ message: 'Validations error', issues: error.format() })
-  }
-
   if (zodEnv.NODE_ENV !== 'prod') {
     console.error(error)
   }
