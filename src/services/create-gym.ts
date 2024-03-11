@@ -13,7 +13,7 @@ interface CreateGymServiceResponse {
   gym: Gym
 }
 
-export class GymService {
+export class CreateGymService {
   constructor(private readonly gymsRepository: IGymsRepository) {}
 
   async execute({
